@@ -2,9 +2,10 @@
 
 FAT12IMG=tools/fat12img
 BIN_DIR = ./bin/
+KAL_DIR = ./kal/
 
 # 需要拷贝到硬盘中的文件(暂时)
-DISK_FILES = 
+DISK_FILES = $(KAL_DIR)LOADER.KAL \
 
 # 默认规则
 all: bootloader KNOS.img
