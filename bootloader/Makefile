@@ -1,5 +1,4 @@
 # /bootloader/Makefile
-# bootloader makefile
 
 INCLUDE = -I ../include
 BIN_DIR = ../bin/

@@ -5,12 +5,12 @@ BIN_DIR = ./bin/
 KAL_DIR = ./kal/
 
 # 需要拷贝到硬盘中的文件(暂时)
-DISK_FILES = $(KAL_DIR)LOADER.KAL \
+DISK_FILES = $(KAL_DIR)LOADER.KAL $(KAL_DIR)KERNEL.KAL \
 
 # 默认规则
-all: bootloader KNOS.img
+all: kernel bootloader KNOS.img
 
-.PHONY: bootloader KNOS.img
+.PHONY: kernel bootloader KNOS.img
 
 # 生成系统和软件的镜像
 KNOS.img: bootloader
@@ -25,7 +25,12 @@ KNOS.img: bootloader
 bootloader:
 	make -C bootloader
 
+kernel:
+	make -C kernel
+
 # 仅保留源代码(暂时)
 clean:
 	rm -f $(BIN_DIR)*.bin
 	rm -f *.img
+	rm -rf kal/*.kal kal/*.KAL
+	make -C kernel clean

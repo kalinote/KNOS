@@ -726,7 +726,7 @@ DisplayPosition		dd	0
 
 StartLoaderMessage:	db	"Start Loader"
 NoLoaderMessage:	db	"ERROR:No KERNEL Found"
-KernelFileName:		db	"KERNEL  BIN",0
+KernelFileName:		db	"KERNEL  KAL",0
 StartGetMemStructMessage:	db	"Start Get Memory Struct."
 GetMemStructErrMessage:	db	"Get Memory Struct ERROR"
 GetMemStructOKMessage:	db	"Get Memory Struct SUCCESSFUL!"
