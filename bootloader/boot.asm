@@ -9,7 +9,7 @@
 StackBase		equ		0x7c00
 
 ; Loader程序的相关配置
-	LoaderBase		equ		0x9000	; Loader程序的基地址
+	LoaderBase		equ		0x1000	; Loader程序的基地址
 	LoaderOffset	equ		0x0000	; Loader程序的偏移地址
 	; 通过上面两个地址可以计算出Loader在内存中的物理地址为0x90000
 
@@ -56,6 +56,9 @@ start:
 	; 清屏(ah=0x06, al=0x00)
 	mov ah, 06h		; int 10中断，使用0x06 ah功能号时，按照指定范围滚动窗口
 	mov al, 00h		; al为0时表示进行清屏操作
+	mov	bx,	0700h
+	mov	cx,	0
+	mov	dx,	0184fh
 	int 10h
 
 	; 设置光标位置
@@ -71,7 +74,7 @@ start:
 	mov bl, 0fh		; 字符属性(白色高亮，黑色背景不闪烁)
 	mov	dh,	00h		; 游标行号
 	mov dl, 00h		; 游标列号
-	mov	cx,	18		; 字符串长度
+	mov	cx,	12		; 字符串长度
 	push	ax
 	mov	ax,	ds
 	mov	es,	ax
@@ -273,7 +276,7 @@ RootDirSearchLoop		dw	RootDirSectors						; 通过根目录占用扇区大小来
 SectorNumber			dw	0									; 扇区号变量(找个内存地址保存相关变量值)
 Odd						db	0									; 这个变量标记了奇偶性(奇数为1，偶数为0)
 ; 栈
-StartBootMessage:		db	"Start booting KNOS"				; 启动显示信息
+StartBootMessage:		db	"Booting KNOS"				; 启动显示信息
 LoaderFileName:			db	"LOADER  KAL",0						; 需要搜索的Loader程序文件名
 NoLoaderFoundMessage:	db	"LOADER.KAL not found!"				; loader.kal未找到的错误信息
 
