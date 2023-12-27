@@ -1,6 +1,6 @@
 # /Makefile
 
-FAT12IMG=sudo ruby tools/fat12img
+FAT12IMG=python3 tools/fat12img.py
 BIN_DIR = ./bin/
 KAL_DIR = ./kal/
 
