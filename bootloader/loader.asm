@@ -49,8 +49,7 @@ Label_Start:
 	mov	ss,	ax
 	mov	sp,	0x7c00
 
-;=======	display on screen : Start Loader......
-
+; 在屏幕显示StartLoaderMessage
 	mov	ax,	1301h
 	mov	bx,	000fh
 	mov	dx,	0200h		;row 2
@@ -62,7 +61,7 @@ Label_Start:
 	mov	bp,	StartLoaderMessage
 	int	10h
 
-;=======	open address A20
+; 开启A20地址线,进入保护模式
 	push	ax
 	in	al,	92h
 	or	al,	00000010b
@@ -86,13 +85,13 @@ Label_Start:
 
 	sti
 
-;=======	reset floppy
+; 重置软盘
 
 	xor	ah,	ah
 	xor	dl,	dl
 	int	13h
 
-;=======	search kernel.bin
+; 从软盘中读取KERNEL.KAL
 	mov	word	[SectorNo],	RootDirStartSectors
 
 Lable_Search_In_Root_Dir_Begin:
@@ -145,7 +144,7 @@ Label_Goto_Next_Sector_In_Root_Dir:
 	add	word	[SectorNo],	1
 	jmp	Lable_Search_In_Root_Dir_Begin
 	
-;=======	display on screen : ERROR:No KERNEL Found
+; 未找到KERNEL.KAL,在屏幕上显示提示
 
 Label_No_LoaderBin:
 
@@ -161,7 +160,7 @@ Label_No_LoaderBin:
 	int	10h
 	jmp	$
 
-;=======	found loader.bin name in root director struct
+; 在跟目录中找到KERNEL.KAL
 
 Label_FileName_Found:
 	mov	ax,	RootDirSectors
@@ -256,7 +255,7 @@ KillMotor:
 	out	dx,	al
 	pop	dx
 
-;=======	get memory address size type
+; 记录内存地址信息
 
 	mov	ax,	1301h
 	mov	bx,	000Fh
@@ -314,7 +313,7 @@ Label_Get_Mem_OK:
 	mov	bp,	GetMemStructOKMessage
 	int	10h	
 
-;=======	get SVGA information
+; 获取SVGA信息
 
 	mov	ax,	1301h
 	mov	bx,	000Fh
