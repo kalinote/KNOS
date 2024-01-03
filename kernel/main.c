@@ -49,6 +49,14 @@ void Start_Kernel(void) {
 
     color_printk(YELLOW, BLACK, "Hello, KNOS!\n");
 
+	load_TR(8);
+
+	set_tss64(0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00);
+
+	sys_vector_init();
+
+	// i = 1/0;
+
     while (1)
         ;
 }
