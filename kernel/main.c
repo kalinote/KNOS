@@ -1,3 +1,4 @@
+#include "gate.h"
 #include "lib.h"
 #include "printk.h"
 
