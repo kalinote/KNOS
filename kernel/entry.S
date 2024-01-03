@@ -1,5 +1,6 @@
 #include "headers/linkage.h"
 
+// 各寄存器在栈中保存顺序
 R15	=	0x00
 R14	=	0x08
 R13	=	0x10

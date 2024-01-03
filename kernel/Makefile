@@ -8,8 +8,8 @@ GCC_PARAM = -mcmodel=large -fno-builtin -m64 -Iheaders
 all: system
 	objcopy -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary system ../kal/KERNEL.KAL
 
-system: head.o entry.o main.o printk.o trap.o
-	$(LD) -b elf64-x86-64 -o system head.o entry.o main.o printk.o trap.o -T Kernel.lds
+system: head.o entry.o main.o printk.o trap.o memory.o
+	$(LD) -b elf64-x86-64 -o system head.o entry.o main.o printk.o trap.o memory.o -T Kernel.lds
 
 main.o: main.c
 	$(GCC) $(GCC_PARAM) -c main.c
@@ -19,6 +19,9 @@ printk.o: printk.c
 
 trap.o: trap.c
 	$(GCC) $(GCC_PARAM) -c trap.c
+
+memory.o: memory.c
+	$(GCC) $(GCC_PARAM) -c memory.c
 
 head.o: head.S
 	$(GCC) -E head.S > head.s
