@@ -1,15 +1,11 @@
 #include "gate.h"
-#include "trap.h"
 #include "lib.h"
-#include "printk.h"
 #include "memory.h"
+#include "printk.h"
+#include "task.h"
+#include "trap.h"
 
-extern char _text;
-extern char _etext;
-extern char _edata;
-extern char _end;
-
-struct Global_Memory_Descriptor memory_management_struct = {{0},0};
+struct Global_Memory_Descriptor memory_management_struct = {{0}, 0};
 
 void Start_Kernel(void) {
     int *addr = (int *)0xffff800000a00000;
@@ -25,7 +21,8 @@ void Start_Kernel(void) {
     Pos.YCharSize = 16;
 
     Pos.FB_addr = (int *)0xffff800000a00000;
-    Pos.FB_length = (Pos.XResolution * Pos.YResolution * 4 + PAGE_4K_SIZE - 1) & PAGE_4K_MASK;
+    Pos.FB_length = (Pos.XResolution * Pos.YResolution * 4 + PAGE_4K_SIZE - 1) &
+                    PAGE_4K_MASK;
 
     for (i = 0; i < 1440 * 20; i++) {
         *((char *)addr + 0) = (char)0x00;
@@ -60,23 +57,25 @@ void Start_Kernel(void) {
 
     load_TR(8);
 
-    set_tss64(0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00,
+    set_tss64(_stack_start, _stack_start, _stack_start, 0xffff800000007c00,
               0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00,
-              0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00,
-              0xffff800000007c00);
+              0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00);
 
     sys_vector_init();
 
-	memory_management_struct.start_code = (unsigned long)& _text;
-	memory_management_struct.end_code   = (unsigned long)& _etext;
-	memory_management_struct.end_data   = (unsigned long)& _edata;
-	memory_management_struct.end_brk    = (unsigned long)& _end;
+    memory_management_struct.start_code = (unsigned long)&_text;
+    memory_management_struct.end_code = (unsigned long)&_etext;
+    memory_management_struct.end_data = (unsigned long)&_edata;
+    memory_management_struct.end_brk = (unsigned long)&_end;
 
-	color_printk(RED,BLACK,"memory init \n");
-	init_memory();
+    color_printk(RED, BLACK, "memory init \n");
+    init_memory();
 
-	color_printk(RED,BLACK,"interrupt init \n");
-	init_interrupt();
+    color_printk(RED, BLACK, "interrupt init \n");
+    init_interrupt();
+
+    color_printk(RED, BLACK, "task_init \n");
+    task_init();
 
     while (1)
         ;

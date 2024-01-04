@@ -1,8 +1,8 @@
+#include "headers/linkage.h"
+
 .section .text
 
-.globl _start
-
-_start:
+ENTRY(_start)
 
 	mov	$0x10,	%ax
 	mov	%ax,	%ds
@@ -48,7 +48,7 @@ entry64:
 	movq	%rax,	%es
 	movq	%rax,	%gs
 	movq	%rax,	%ss
-	movq	$0xffff800000007E00,	%rsp		/* rsp address */
+	movq	_stack_start(%rip),	%rsp		/* rsp address */
 
 setup_IDT:							
 	leaq	ignore_int(%rip),	%rdx
@@ -91,8 +91,8 @@ setup_TSS64:
 	shrq	$32,	%rdx
 	movq	%rdx,	72(%rdi)
 
-	// mov	$0x40,	%ax
-	// ltr	%ax
+//	mov	$0x40,	%ax
+//	ltr	%ax
 
 	movq	go_to_kernel(%rip),	%rax		/* movq address */
 	pushq	$0x08
@@ -170,6 +170,11 @@ Loop:
 
 int_msg:
 	.asciz "Unknown interrupt or fault at RIP\n"
+
+ENTRY(_stack_start)
+	.quad	init_task_union + 32768
+
+
 
 //=======	init page
 .align 8
@@ -250,7 +255,7 @@ TSS64_Table:
 	.fill  13,8,0
 TSS64_END:
 
+
 TSS64_POINTER:
 TSS64_LIMIT:	.word	TSS64_END - TSS64_Table - 1
 TSS64_BASE:	.quad	TSS64_Table
-
