@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "printk.h"
 #include "ptrace.h"
+#include "syscall.h"
 
 struct mm_struct init_mm = {0};
 union task_union init_task_union __attribute__((
@@ -20,34 +21,25 @@ struct thread_struct init_thread = {
     .trap_nr = 0,
     .error_code = 0};
 struct tss_struct init_tss[NR_CPUS] = {[0 ... NR_CPUS - 1] = INIT_TSS};
-unsigned long no_system_call(struct pt_regs * regs)
-{
-	color_printk(RED,BLACK,"no_system_call is calling,NR:%#04x\n",regs->rax);
-	return -1;
-}
-
-system_call_t system_call_table[MAX_SYSTEM_CALL_NR] = 
-{
-	[0 ... MAX_SYSTEM_CALL_NR-1] = no_system_call
-};
 
 extern void ret_system_call(void);
 extern void system_call(void);
 
 void user_level_function() {
     long ret = 0;
-    color_printk(RED, BLACK, "user_level_function task is running\n");
+    //	color_printk(RED,BLACK,"user_level_function task is running\n");
+    char string[] = "Hello World!\n";
 
     __asm__ __volatile__("leaq	sysexit_return_address(%%rip),	%%rdx	\n\t"
                          "movq	%%rsp,	%%rcx		\n\t"
                          "sysenter			\n\t"
                          "sysexit_return_address:	\n\t"
                          : "=a"(ret)
-                         : "0"(15)
+                         : "0"(1), "D"(string)
                          : "memory");
 
-    color_printk(RED, BLACK,
-                 "user_level_function task called sysenter,ret:%ld\n", ret);
+    //	color_printk(RED,BLACK,"user_level_function task called
+    //sysenter,ret:%ld\n",ret);
 
     while (1)
         ;

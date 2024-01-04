@@ -3,6 +3,7 @@
         "memory.h": "c",
         "printk.h": "c",
         "lib.h": "c",
-        "ptrace.h": "c"
+        "ptrace.h": "c",
+        "syscall.h": "c"
     }
 }

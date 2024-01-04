@@ -213,8 +213,4 @@ unsigned long do_fork(struct pt_regs *regs, unsigned long clone_flags,
                       unsigned long stack_start, unsigned long stack_size);
 void task_init();
 
-#define MAX_SYSTEM_CALL_NR 128
-typedef unsigned long (* system_call_t)(struct pt_regs * regs);
-extern system_call_t system_call_table[];
-
 #endif
