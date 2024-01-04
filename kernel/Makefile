@@ -5,7 +5,7 @@ LD = ld
 AS = as
 GCC_PARAM = -mcmodel=large -fno-builtin -m64 -Iheaders
 
-OBJECTS = head.o entry.o main.o printk.o trap.o memory.o
+OBJECTS = head.o entry.o main.o printk.o trap.o memory.o interrupt.o
 TARGET = system
 
 all: $(TARGET)
