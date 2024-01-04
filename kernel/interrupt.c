@@ -123,5 +123,5 @@ void do_IRQ(struct pt_regs * regs,unsigned long nr) {
 	x = io_in8(0x60);
 	color_printk(RED,BLACK,"key code:%#018lx\t",x);
 	io_out8(0x20,0x20);
-	color_printk(RED,BLACK,"<RIP:%#018lx\tRSP:%#018lx>\n",regs->rip,regs->rsp);
+	color_printk(RED,BLACK,"regs:%#018lx\t<RIP:%#018lx\tRSP:%#018lx>\n",regs,regs->rip,regs->rsp);
 }
