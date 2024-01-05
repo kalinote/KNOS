@@ -285,10 +285,7 @@ extern struct Slab_cache kmalloc_cache_size[];
 
 static inline unsigned long *Get_gdt() {
     unsigned long *tmp;
-    __asm__ __volatile__("movq	%%cr3,	%0	\n\t"
-                         : "=r"(tmp)
-                         :
-                         : "memory");
+    __asm__ __volatile__("movq	%%cr3,	%0	\n\t" : "=r"(tmp) : : "memory");
     return tmp;
 }
 
