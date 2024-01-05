@@ -1,6 +1,5 @@
 #include "headers/linkage.h"
 
-// 各寄存器在栈中保存顺序
 R15	=	0x00
 R14	=	0x08
 R13	=	0x10
@@ -113,7 +112,8 @@ ENTRY(ret_system_call)
 	popq	%rax				 
 	addq	$0x38,	%rsp	
 	.byte	0x48		 
-	sysexit
+	sysexit					 
+
 
 ENTRY(divide_error)
 	pushq	$0
@@ -316,5 +316,4 @@ ENTRY(virtualization_exception)
 	leaq	do_virtualization_exception(%rip),	%rax
 	xchgq	%rax,	(%rsp)
 	jmp	error_code
-
 
