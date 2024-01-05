@@ -19,6 +19,17 @@ extern unsigned int TSS64_Table[26];
 
 */
 
+/**
+ * @brief 设置门描述符的宏
+ *
+ * 此宏用于设置门描述符，包括选择子地址、属性、中断栈表指针、代码地址等信息。
+ * 中断程序或异常处理程序会通过这个宏设置门描述符。
+ *
+ * @param gate_selector_addr 选择子地址
+ * @param attr 属性
+ * @param ist 中断栈表指针
+ * @param code_addr 代码地址
+ */
 #define _set_gate(gate_selector_addr,attr,ist,code_addr)	\
 do								\
 {	unsigned long __d0,__d1;				\
