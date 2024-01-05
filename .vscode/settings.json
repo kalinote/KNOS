@@ -4,6 +4,7 @@
         "printk.h": "c",
         "lib.h": "c",
         "ptrace.h": "c",
-        "syscall.h": "c"
+        "syscall.h": "c",
+        "cpu.h": "c"
     }
 }

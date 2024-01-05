@@ -4,6 +4,7 @@
 #include "printk.h"
 #include "task.h"
 #include "trap.h"
+#include "cpu.h"
 
 struct Global_Memory_Descriptor memory_management_struct = {{0}, 0};
 
@@ -62,6 +63,9 @@ void Start_Kernel(void) {
               0xffff800000007c00, 0xffff800000007c00, 0xffff800000007c00);
 
     sys_vector_init();
+
+    color_printk(RED, BLACK, "CPU init \n");
+    init_cpu();
 
     memory_management_struct.start_code = (unsigned long)&_text;
     memory_management_struct.end_code = (unsigned long)&_etext;

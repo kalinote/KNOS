@@ -102,8 +102,8 @@ static inline void *memcpy(void *From, void *To, long Num) {
 static inline int memcmp(void *FirstPart, void *SecondPart, long Count) {
     register int __res;
 
-    __asm__ __volatile__("cld	\n\t" // clean direct
-                         "repe	\n\t" // repeat if equal
+    __asm__ __volatile__("cld	\n\t"
+                         "repe	\n\t"
                          "cmpsb	\n\t"
                          "je	1f	\n\t"
                          "movl	$1,	%%eax	\n\t"

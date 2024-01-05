@@ -5,6 +5,7 @@
 #include "printk.h"
 #include "ptrace.h"
 #include "syscall.h"
+#include "cpu.h"
 
 struct mm_struct init_mm = {0};
 union task_union init_task_union __attribute__((
@@ -156,7 +157,6 @@ __asm__("kernel_thread_func:	\n\t"
         "	movq	%rax,	%es	\n\t"
         "	popq	%rax		\n\t"
         "	addq	$0x38,	%rsp	\n\t"
-        /////////////////////////////////
         "	movq	%rdx,	%rdi	\n\t"
         "	callq	*%rbx		\n\t"
         "	movq	%rax,	%rdi	\n\t"

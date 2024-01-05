@@ -53,10 +53,11 @@ extern unsigned int TSS64_Table[26];
             : "memory");                                                       \
     } while (0)
 
-/*
-
-*/
-
+/**
+ * 将任务寄存器（Task Register）加载为指定值。
+ *
+ * @param n 指定的值
+ */
 #define load_TR(n)                                                             \
     do {                                                                       \
         __asm__ __volatile__("ltr	%%ax" : : "a"(n << 3) : "memory");     \
