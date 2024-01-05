@@ -1,11 +1,11 @@
 #include "task.h"
+#include "cpu.h"
 #include "lib.h"
 #include "linkage.h"
 #include "memory.h"
 #include "printk.h"
 #include "ptrace.h"
 #include "syscall.h"
-#include "cpu.h"
 
 struct mm_struct init_mm = {0};
 union task_union init_task_union __attribute__((
@@ -40,7 +40,7 @@ void user_level_function() {
                          : "memory");
 
     //	color_printk(RED,BLACK,"user_level_function task called
-    //sysenter,ret:%ld\n",ret);
+    // sysenter,ret:%ld\n",ret);
 
     while (1)
         ;
@@ -56,7 +56,7 @@ unsigned long do_execve(struct pt_regs *regs) {
 
     memcpy(user_level_function, (void *)0x800000, 1024);
 
-    return 0;
+    return 1;
 }
 
 unsigned long init(unsigned long arg) {
@@ -87,7 +87,7 @@ unsigned long do_fork(struct pt_regs *regs, unsigned long clone_flags,
     color_printk(WHITE, BLACK, "alloc_pages,bitmap:%#018lx\n",
                  *memory_management_struct.bits_map);
 
-    p = alloc_pages(ZONE_NORMAL, 1, PG_PTable_Maped | PG_Active | PG_Kernel);
+    p = alloc_pages(ZONE_NORMAL, 1, PG_PTable_Maped | PG_Kernel);
 
     color_printk(WHITE, BLACK, "alloc_pages,bitmap:%#018lx\n",
                  *memory_management_struct.bits_map);
@@ -114,15 +114,15 @@ unsigned long do_fork(struct pt_regs *regs, unsigned long clone_flags,
     thd->rsp0 = (unsigned long)tsk + STACK_SIZE;
     thd->rip = regs->rip;
     thd->rsp = (unsigned long)tsk + STACK_SIZE - sizeof(struct pt_regs);
-	thd->fs = KERNEL_DS;
-	thd->gs = KERNEL_DS;
+    thd->fs = KERNEL_DS;
+    thd->gs = KERNEL_DS;
 
     if (!(tsk->flags & PF_KTHREAD))
         thd->rip = regs->rip = (unsigned long)ret_system_call;
 
     tsk->state = TASK_RUNNING;
 
-    return 0;
+    return 1;
 }
 
 unsigned long do_exit(unsigned long code) {
