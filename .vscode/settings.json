@@ -6,6 +6,9 @@
         "ptrace.h": "c",
         "syscall.h": "c",
         "cpu.h": "c",
-        "graphical.h": "c"
+        "graphical.h": "c",
+        "interrupt.h": "c",
+        "8259a.h": "c",
+        "apic.h": "c"
     }
 }

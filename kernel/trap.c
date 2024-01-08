@@ -8,7 +8,7 @@
 
 void do_divide_error(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_divide_error(0),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -20,7 +20,7 @@ void do_divide_error(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_debug(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_debug(1),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
     while (1)
@@ -32,7 +32,7 @@ void do_debug(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_nmi(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_nmi(2),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
     while (1)
@@ -44,7 +44,7 @@ void do_nmi(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_int3(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_int3(3),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
     while (1)
@@ -56,7 +56,7 @@ void do_int3(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_overflow(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_overflow(4),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
     while (1)
@@ -68,7 +68,7 @@ void do_overflow(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_bounds(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_bounds(5),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
     while (1)
@@ -81,7 +81,7 @@ void do_bounds(struct pt_regs *regs, unsigned long error_code) {
 
 void do_undefined_opcode(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_undefined_opcode(6),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -94,7 +94,7 @@ void do_undefined_opcode(struct pt_regs *regs, unsigned long error_code) {
 
 void do_dev_not_available(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_dev_not_available(7),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -107,7 +107,7 @@ void do_dev_not_available(struct pt_regs *regs, unsigned long error_code) {
 
 void do_double_fault(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_double_fault(8),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -120,7 +120,7 @@ void do_double_fault(struct pt_regs *regs, unsigned long error_code) {
 
 void do_coprocessor_segment_overrun(struct pt_regs *regs,
                                     unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_coprocessor_segment_overrun(9),ERROR_CODE:%#018lx,RSP:%#"
                  "018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
@@ -134,32 +134,32 @@ void do_coprocessor_segment_overrun(struct pt_regs *regs,
 
 void do_invalid_TSS(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_invalid_TSS(10),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
 
     if (error_code & 0x01)
         color_printk(
-            RED, BLACK,
+            RED, WHITE,
             "The exception occurred during delivery of an event external to "
             "the program,such as an interrupt or an earlier exception.\n");
 
     if (error_code & 0x02)
-        color_printk(RED, BLACK, "Refers to a gate descriptor in the IDT;\n");
+        color_printk(RED, WHITE, "Refers to a gate descriptor in the IDT;\n");
     else
-        color_printk(RED, BLACK,
+        color_printk(RED, WHITE,
                      "Refers to a descriptor in the GDT or the current LDT;\n");
 
     if ((error_code & 0x02) == 0)
         if (error_code & 0x04)
             color_printk(
-                RED, BLACK,
+                RED, WHITE,
                 "Refers to a segment or gate descriptor in the LDT;\n");
         else
-            color_printk(RED, BLACK,
+            color_printk(RED, WHITE,
                          "Refers to a descriptor in the current GDT;\n");
 
-    color_printk(RED, BLACK, "Segment Selector Index:%#010x\n",
+    color_printk(RED, WHITE, "Segment Selector Index:%#010x\n",
                  error_code & 0xfff8);
 
     while (1)
@@ -171,33 +171,33 @@ void do_invalid_TSS(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_segment_not_present(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_segment_not_present(11),ERROR_CODE:%#018lx,RSP:%#018lx,"
                  "RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
 
     if (error_code & 0x01)
         color_printk(
-            RED, BLACK,
+            RED, WHITE,
             "The exception occurred during delivery of an event external to "
             "the program,such as an interrupt or an earlier exception.\n");
 
     if (error_code & 0x02)
-        color_printk(RED, BLACK, "Refers to a gate descriptor in the IDT;\n");
+        color_printk(RED, WHITE, "Refers to a gate descriptor in the IDT;\n");
     else
-        color_printk(RED, BLACK,
+        color_printk(RED, WHITE,
                      "Refers to a descriptor in the GDT or the current LDT;\n");
 
     if ((error_code & 0x02) == 0)
         if (error_code & 0x04)
             color_printk(
-                RED, BLACK,
+                RED, WHITE,
                 "Refers to a segment or gate descriptor in the LDT;\n");
         else
-            color_printk(RED, BLACK,
+            color_printk(RED, WHITE,
                          "Refers to a descriptor in the current GDT;\n");
 
-    color_printk(RED, BLACK, "Segment Selector Index:%#010x\n",
+    color_printk(RED, WHITE, "Segment Selector Index:%#010x\n",
                  error_code & 0xfff8);
 
     while (1)
@@ -209,33 +209,33 @@ void do_segment_not_present(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_stack_segment_fault(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_stack_segment_fault(12),ERROR_CODE:%#018lx,RSP:%#018lx,"
                  "RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
 
     if (error_code & 0x01)
         color_printk(
-            RED, BLACK,
+            RED, WHITE,
             "The exception occurred during delivery of an event external to "
             "the program,such as an interrupt or an earlier exception.\n");
 
     if (error_code & 0x02)
-        color_printk(RED, BLACK, "Refers to a gate descriptor in the IDT;\n");
+        color_printk(RED, WHITE, "Refers to a gate descriptor in the IDT;\n");
     else
-        color_printk(RED, BLACK,
+        color_printk(RED, WHITE,
                      "Refers to a descriptor in the GDT or the current LDT;\n");
 
     if ((error_code & 0x02) == 0)
         if (error_code & 0x04)
             color_printk(
-                RED, BLACK,
+                RED, WHITE,
                 "Refers to a segment or gate descriptor in the LDT;\n");
         else
-            color_printk(RED, BLACK,
+            color_printk(RED, WHITE,
                          "Refers to a descriptor in the current GDT;\n");
 
-    color_printk(RED, BLACK, "Segment Selector Index:%#010x\n",
+    color_printk(RED, WHITE, "Segment Selector Index:%#010x\n",
                  error_code & 0xfff8);
 
     while (1)
@@ -247,33 +247,33 @@ void do_stack_segment_fault(struct pt_regs *regs, unsigned long error_code) {
 */
 
 void do_general_protection(struct pt_regs *regs, unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_general_protection(13),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:"
                  "%#018lx\n",
                  error_code, regs->rsp, regs->rip);
 
     if (error_code & 0x01)
         color_printk(
-            RED, BLACK,
+            RED, WHITE,
             "The exception occurred during delivery of an event external to "
             "the program,such as an interrupt or an earlier exception.\n");
 
     if (error_code & 0x02)
-        color_printk(RED, BLACK, "Refers to a gate descriptor in the IDT;\n");
+        color_printk(RED, WHITE, "Refers to a gate descriptor in the IDT;\n");
     else
-        color_printk(RED, BLACK,
+        color_printk(RED, WHITE,
                      "Refers to a descriptor in the GDT or the current LDT;\n");
 
     if ((error_code & 0x02) == 0)
         if (error_code & 0x04)
             color_printk(
-                RED, BLACK,
+                RED, WHITE,
                 "Refers to a segment or gate descriptor in the LDT;\n");
         else
-            color_printk(RED, BLACK,
+            color_printk(RED, WHITE,
                          "Refers to a descriptor in the current GDT;\n");
 
-    color_printk(RED, BLACK, "Segment Selector Index:%#010x\n",
+    color_printk(RED, WHITE, "Segment Selector Index:%#010x\n",
                  error_code & 0xfff8);
 
     while (1)
@@ -290,32 +290,30 @@ void do_page_fault(struct pt_regs *regs, unsigned long error_code) {
     __asm__ __volatile__("movq	%%cr2,	%0" : "=r"(cr2)::"memory");
 
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_page_fault(14),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
 
     if (!(error_code & 0x01))
-        color_printk(RED, BLACK, "Page Not-Present,\t");
+        color_printk(RED, WHITE, "Page Not-Present,\t");
 
     if (error_code & 0x02)
-        color_printk(RED, BLACK, "Write Cause Fault,\t");
+        color_printk(RED, WHITE, "Write Cause Fault,\t");
     else
-        color_printk(RED, BLACK, "Read Cause Fault,\t");
+        color_printk(RED, WHITE, "Read Cause Fault,\t");
 
     if (error_code & 0x04)
-        color_printk(RED, BLACK, "Fault in user(3)\t");
+        color_printk(RED, WHITE, "Fault in user(3)\t");
     else
-        color_printk(RED, BLACK, "Fault in supervisor(0,1,2)\t");
+        color_printk(RED, WHITE, "Fault in supervisor(0,1,2)\t");
 
     if (error_code & 0x08)
-        color_printk(RED, BLACK, ",Reserved Bit Cause Fault\t");
+        color_printk(RED, WHITE, ",Reserved Bit Cause Fault\t");
 
     if (error_code & 0x10)
-        color_printk(RED, BLACK, ",Instruction fetch Cause Fault");
-
-    color_printk(RED, BLACK, "\n");
-
-    color_printk(RED, BLACK, "CR2:%#018lx\n", cr2);
+        color_printk(RED, WHITE, ",Instruction fetch Cause Fault");
+        
+    color_printk(RED, WHITE, "\nCR2:%#018lx\n", cr2);
 
     while (1)
         ;
@@ -327,7 +325,7 @@ void do_page_fault(struct pt_regs *regs, unsigned long error_code) {
 
 void do_x87_FPU_error(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_x87_FPU_error(16),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -340,7 +338,7 @@ void do_x87_FPU_error(struct pt_regs *regs, unsigned long error_code) {
 
 void do_alignment_check(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_alignment_check(17),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -353,7 +351,7 @@ void do_alignment_check(struct pt_regs *regs, unsigned long error_code) {
 
 void do_machine_check(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_machine_check(18),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -366,7 +364,7 @@ void do_machine_check(struct pt_regs *regs, unsigned long error_code) {
 
 void do_SIMD_exception(struct pt_regs *regs, unsigned long error_code) {
     color_printk(
-        RED, BLACK,
+        RED, WHITE,
         "do_SIMD_exception(19),ERROR_CODE:%#018lx,RSP:%#018lx,RIP:%#018lx\n",
         error_code, regs->rsp, regs->rip);
     while (1)
@@ -379,7 +377,7 @@ void do_SIMD_exception(struct pt_regs *regs, unsigned long error_code) {
 
 void do_virtualization_exception(struct pt_regs *regs,
                                  unsigned long error_code) {
-    color_printk(RED, BLACK,
+    color_printk(RED, WHITE,
                  "do_virtualization_exception(20),ERROR_CODE:%#018lx,RSP:%#"
                  "018lx,RIP:%#018lx\n",
                  error_code, regs->rsp, regs->rip);
