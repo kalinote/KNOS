@@ -381,61 +381,122 @@ Label_Get_Mem_OK:
 
 	mov	ax,	0x00
 	mov	es,	ax
-	mov	si,	0x800e
-
-	mov	esi,	dword	[es:si]
-	mov	edi,	0x8200
-
-Label_SVGA_Mode_Info_Get:
-
-	mov	cx,	word	[es:esi]
-
-;=======	display SVGA mode information
-
-	push	ax
 	
+	mov	si,	0x8000
+
+	mov	cx,	22h;;;;;;;;;;;;;;;;;;
+LOOP_Disp_VBE_Info:
+
+	mov	ax,	00h
+	mov	al,	byte	[es:si]
+	call	Label_DispAL
+	call	Label_DispSpace
+	add	si,	1
+
+	loop	LOOP_Disp_VBE_Info
+	
+	mov	cx,	0x55aa
+	push	ax	
 	mov	ax,	00h
 	mov	al,	ch
 	call	Label_DispAL
-
 	mov	ax,	00h
 	mov	al,	cl	
-	call	Label_DispAL
-	
+	call	Label_DispAL	
 	pop	ax
 
-;=======
-	
-	cmp	cx,	0FFFFh
-	jz	Label_SVGA_Mode_Info_Finish
+	mov	cx,	0xff;;;;;;;;;;;;;;
+
+LABEL_Get_Mode_List:
+
+	add	cx,	1
+
+	cmp	cx,	0x200
+	jz	LABEL_Get_Mode_Finish
 
 	mov	ax,	4F01h
+	mov	edi,	0x8200
 	int	10h
 
 	cmp	ax,	004Fh
+	jnz	LABEL_Get_Mode_List
 
-	jnz	Label_SVGA_Mode_Info_FAIL	
+	push	ax	
+	mov	ax,	00h
+	mov	al,	ch
+	call	Label_DispAL
+	mov	ax,	00h
+	mov	al,	cl	
+	call	Label_DispAL	
+	pop	ax
 
-	add	esi,	2
-	add	edi,	0x100
+	call	Label_DispSpace
 
-	jmp	Label_SVGA_Mode_Info_Get
-		
-Label_SVGA_Mode_Info_FAIL:
+	jmp	LABEL_Get_Mode_List
+	
+LABEL_Get_Mode_Finish:
+
+	mov	cx,	0x55aa
+	push	ax	
+	mov	ax,	00h
+	mov	al,	ch
+	call	Label_DispAL
+	mov	ax,	00h
+	mov	al,	cl	
+	call	Label_DispAL	
+	pop	ax
+
+	mov	cx,	0x118	;;;;;;;;;;;;mode
+	mov	ax,	4F01h
+	mov	edi,	0x8200
+	int	10h
+
+	push	ax	
+	mov	ax,	00h
+	mov	al,	ch
+	call	Label_DispAL
+	mov	ax,	00h
+	mov	al,	cl	
+	call	Label_DispAL	
+	pop	ax
+
+	call	Label_DispSpace
+
+	mov	cx,	0x55aa
+	push	ax	
+	mov	ax,	00h
+	mov	al,	ch
+	call	Label_DispAL
+	mov	ax,	00h
+	mov	al,	cl	
+	call	Label_DispAL	
+	pop	ax
+
+	mov	si,	0x8200
+	mov	cx,	128
+LOOP_Disp_Mode_Info:
+	mov	ax,	00h
+	mov	al,	byte	[es:si]
+	call	Label_DispAL
+	call	Label_DispSpace
+	add	si,	1
+	loop	LOOP_Disp_Mode_Info
+	jmp	$
+
+	jmp	Label_SVGA_Mode_Info_Finish
+
+Label_SET_SVGA_Mode_VESA_VBE_FAIL:
 
 	mov	ax,	1301h
 	mov	bx,	008Ch
 	mov	dx,	0D00h		;row 13
-	mov	cx,	24
+	mov	cx,	27
 	push	ax
 	mov	ax,	ds
 	mov	es,	ax
 	pop	ax
-	mov	bp,	GetSVGAModeInfoErrMessage
+	mov	bp,	SetSVGAModeInfoVBAVESAMessage
 	int	10h
-
-Label_SET_SVGA_Mode_VESA_VBE_FAIL:
-
 	jmp	$
 
 Label_SVGA_Mode_Info_Finish:
@@ -701,6 +762,26 @@ Label_DispAL:
 	
 	ret
 
+Label_DispSpace:
+
+    push	ecx
+    push	edx
+    push	edi
+    
+    mov	edi,	[DisplayPosition]
+    mov	ah,	0Fh
+    mov	al,	' ' ; ASCII code for space
+    
+    mov	[gs:edi],	ax
+    add	edi,	2
+    
+    mov	[DisplayPosition],	edi
+
+    pop	edi
+    pop	edx
+    pop	ecx
+    
+    ret
 
 ;=======	tmp IDT
 
@@ -737,3 +818,5 @@ GetSVGAVBEInfoOKMessage:	db	"Get SVGA VBE Info SUCCESSFUL!"
 StartGetSVGAModeInfoMessage:	db	"Start Get SVGA Mode Info"
 GetSVGAModeInfoErrMessage:	db	"Get SVGA Mode Info ERROR"
 GetSVGAModeInfoOKMessage:	db	"Get SVGA Mode Info SUCCESSFUL!"
+
+SetSVGAModeInfoVBAVESAMessage:	db	"Set SVGA Mode VBE VESA Fail"
