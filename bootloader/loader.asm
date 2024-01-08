@@ -384,7 +384,7 @@ Label_Get_Mem_OK:
 	
 	mov	si,	0x8000
 
-	mov	cx,	22h;;;;;;;;;;;;;;;;;;
+	; mov	cx,	64h;;;;;;;;;;;;;;;;;;
 LOOP_Disp_VBE_Info:
 
 	mov	ax,	00h
