@@ -2,20 +2,20 @@
 
 GCC = gcc
 LD = ld
-AS = as
+NASM = nasm
+OBJCOPY = objcopy
 
 all: system
-	objcopy -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary system ../kal/KERNEL.KAL
+	$(OBJCOPY) -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary system ../kal/KERNEL.KAL
 
 system: head.o main.o
-	$(LD) -b elf64-x86-64 -o system head.o main.o -T Kernel.lds
+	$(LD) -b elf64-x86-64 -o system head.o main.o -T kernel_link.ld
 
-main.o: main.c
+head.o:	head.asm
+	$(NASM) -f elf64 head.asm -o head.o
+
+main.o:	main.c
 	$(GCC) -mcmodel=large -fno-builtin -m64 -c main.c
 
-head.o: head.S
-	$(GCC) -E head.S > head.s
-	$(AS) --64 -o head.o head.s
-
 clean:
-	rm -rf *.o *.s *.bin system
+	rm -rf *.o *.ss *.bin system

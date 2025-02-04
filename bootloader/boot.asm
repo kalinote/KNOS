@@ -1,8 +1,8 @@
-; ----------------
+; =========================
 ;   bootloader/boot.asm
-;   引导扇区文件
+;   引导扇区程序
 ;   KNOS
-; ----------------
+; =========================
 
     org 0x7c00
 
@@ -11,36 +11,13 @@ StackBase		equ		0x7c00
 ; Loader程序的相关配置
 	LoaderBase		equ		0x1000	; Loader程序的基地址
 	LoaderOffset	equ		0x0000	; Loader程序的偏移地址
-	; 通过上面两个地址可以计算出Loader在内存中的物理地址为0x90000
-
-; 文件系统相关配置(数据都来源于FAT12引导扇区内的数据，不嫌麻烦的可以自己写一个计算程序来计算)
-	RootDirSectors		equ		14		; 根目录占用的扇区数，其计算方法为：(根目录数 * 32 + 每扇区字节数 - 1) / 每扇区的字节数
-	RootDirStartSectors	equ		19		; 根目录起始扇区，其计算方法为：保留扇区数 + FAT表数 * 每个FAT表占用扇区
-	FAT1StartSectors	equ		1		; FAT表1起始扇区
-	SectorBalance		equ		17		; 根目录起始扇区-2，方便计算FAT
+	; 通过上面两个地址可以计算出Loader在内存中的物理地址为0x10000
 
 ; FAT12格式
 	jmp	short start				; 跳转到启动代码
 	nop
-	OEMName				db	'KNOSBOOT'			; 启动区名称(8字节)
-	BytesPreSector		dw	512					; 每个扇区大小为0x200
-	SectorsPreCluster	db	1					; 每个簇大小为一个扇区
-	FATStartCluster		dw	1					; FAT起始位置(boot记录占用扇区数)
-	FATNumber			db	2          		    ; FAT表数
-	MaxRootDirNumber	dw	224					; 根目录最大文件数
-	TotalSectorsNumber	dw	2880				; 磁盘大小(总扇区数，如果这里扇区数为0，则由下面给出)
-	MediaType			db	0xf0                ; 磁盘种类
-	FATSize				dw	9					; FAT长度(每个FAT表占用扇区数)
-	SectorsPreTrack		dw	18					; 每个磁道的扇区数
-	HeadsNumber			dw	2					; 磁头数(面数)
-	UnusedSector		dd	0                   ; 不使用分区(隐藏扇区数)
-	TotalSectorsNumber2	dd	0					; 重写一遍磁盘大小(如果上面的扇区数为0，则由这里给出)
-	DriveNumber			db	0                   ; INT 13H的驱动器号
-	Reserve				db	0					; 保留
-	Bootsign			db	0x29                ; 扩展引导标记(29h)磁盘名称(11字节)
-	VolId				dd	0                   ; 卷序列号
-	VolLab				db	'KNOS       '       ; 磁盘名称(11字节)
-	FileSystemType		db	'FAT12   '			; 磁盘格式名称(8字节)
+
+%include	"fat12.inc"
 
 ; 启动代码
 start:
@@ -68,19 +45,20 @@ start:
 	int 10h
 
 	; 显示start booting KNOS
-	mov	ah,	13h		; 显示字符串
-	mov al, 01h		; 完成显示后将光标移动至字符串末尾
-	mov	bh,	00h		; 页码(第0页)
-	mov bl, 0fh		; 字符属性(白色高亮，黑色背景不闪烁)
-	mov	dh,	00h		; 游标行号
-	mov dl, 00h		; 游标列号
-	mov	cx,	12		; 字符串长度
-	push	ax
-	mov	ax,	ds
-	mov	es,	ax
-	pop	ax
-	mov	bp,	StartBootMessage		; es:bp 指向字符串地址
-	int	10h
+	; 为了缩减MBR程序，去掉显示该字符串(反正也看不到)
+	; mov	ah,	13h		; 显示字符串
+	; mov al, 01h		; 完成显示后将光标移动至字符串末尾
+	; mov	bh,	00h		; 页码(第0页)
+	; mov bl, 0fh		; 字符属性(白色高亮，黑色背景不闪烁)
+	; mov	dh,	00h		; 游标行号
+	; mov dl, 00h		; 游标列号
+	; mov	cx,	12		; 字符串长度
+	; push	ax
+	; mov	ax,	ds
+	; mov	es,	ax
+	; pop	ax
+	; mov	bp,	StartBootMessage		; es:bp 指向字符串地址
+	; int	10h
 
 ; ————————————重置软盘驱动器————————————
 	xor ah, ah
@@ -276,7 +254,7 @@ RootDirSearchLoop		dw	RootDirSectors						; 通过根目录占用扇区大小来
 SectorNumber			dw	0									; 扇区号变量(找个内存地址保存相关变量值)
 Odd						db	0									; 这个变量标记了奇偶性(奇数为1，偶数为0)
 ; 栈
-StartBootMessage:		db	"Booting KNOS"				; 启动显示信息
+; StartBootMessage:		db	"Booting KNOS"				; 启动显示信息
 LoaderFileName:			db	"LOADER  KAL",0						; 需要搜索的Loader程序文件名
 NoLoaderFoundMessage:	db	"LOADER.KAL not found!"				; loader.kal未找到的错误信息
 

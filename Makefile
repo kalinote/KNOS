@@ -8,12 +8,12 @@ KAL_DIR = ./kal/
 DISK_FILES = $(KAL_DIR)LOADER.KAL $(KAL_DIR)KERNEL.KAL \
 
 # 默认规则
-all: kernel bootloader KNOS.img
+all: kernel bootloader KNOS.vfd
 
-.PHONY: kernel bootloader KNOS.img
+.PHONY: kernel bootloader KNOS.vfd
 
 # 生成系统和软件的镜像
-KNOS.img: bootloader
+KNOS.vfd: bootloader
 	$(FAT12IMG) $@ format
 	$(FAT12IMG) $@ write $(BIN_DIR)boot.bin 0
 	for filename in $(DISK_FILES); do \
@@ -31,6 +31,6 @@ kernel:
 # 仅保留源代码(暂时)
 clean:
 	rm -f $(BIN_DIR)*.bin
-	rm -f *.img
+	rm -f *.vfd
 	rm -rf kal/*.kal kal/*.KAL
 	make -C kernel clean
