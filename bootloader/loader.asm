@@ -362,9 +362,14 @@ Label_Get_Mem_OK:
 	int	10h
 
 	; 调用 INT 10h, AX=4F00h 获取VBE信息块
+	; 准备512字节缓冲区（ES:DI=0:0x8000），并写入'VBE2'标志以表明支持VBE2.0+
 	mov	ax,	0x00
 	mov	es,	ax
 	mov	di,	VBE_INFO_BLOCK
+	; 写入'VBE2'标志
+	mov word [es:di], 'VB'
+	mov word [es:di+2], 'E2'
+	mov cx, 512             ; 缓冲区大小为512字节
 	mov	ax,	4F00h
 	int	10h
 	cmp	ax,	004Fh
@@ -384,44 +389,6 @@ Label_Get_Mem_OK:
 	jmp	$
 
 .KO:
-	; VBE信息获取成功，显示成功信息
-	mov	ax,	1301h
-	mov	bx,	000Fh
-	mov	dx,	0A00h          ; 在屏幕第10行显示
-	mov	cx,	29
-	push	ax
-	mov	ax,	ds
-	mov	es,	ax
-	pop	ax
-	mov	bp,	GetSVGAVBEInfoOKMessage
-	int	10h
-
-	; ======= 获取 SVGA 模式信息 =======
-	; 显示 "Start Get SVGA Mode Info" 信息
-	mov ax, 1301h
-	mov bx, 000Fh
-	mov dx, 0C00h            ; 在屏幕第12行显示
-	mov cx, 24
-	push ax
-	mov ax, ds
-	mov es, ax
-	pop ax
-	mov bp, StartGetSVGAModeInfoMessage
-	int 10h
-
-	; 准备512字节缓冲区（ES:DI=0:0x8000），并写入'VBE2'标志以表明支持VBE2.0+
-	mov ax, 0
-	mov es, ax
-	mov di, VBE_INFO_BLOCK
-	; 写入'VBE2'标志
-	mov word [es:di], 'VB'
-	mov word [es:di+2], 'E2'
-	mov cx, 512             ; 缓冲区大小为512字节
-	mov ax, 4F00h
-	int 10h
-	cmp ax, 0x004F
-	jnz GetVbeInfoFail      ; 如果失败则跳转
-
 	; VESA标识
 	mov al, 0dh
     call print_char
@@ -581,20 +548,6 @@ ModeInfoFail:
 	int 10h
 	jmp $
 
-GetVbeInfoFail:
-	; 获取VBE信息块失败时的处理
-	mov ax, 1301h
-	mov bx, 008Ch
-	mov dx, 0000h   ; 在屏幕第0行显示错误信息
-	mov cx, 24
-	push ax
-	mov ax, ds
-	mov es, ax
-	pop ax
-	mov bp, GetSVGAModeInfoErrMessage
-	int 10h
-	jmp $
-
 Label_SET_SVGA_Mode_VESA_VBE_FAIL:
 	; 设置SVGA模式失败时显示错误信息
 	mov ax, 1301h
@@ -610,6 +563,7 @@ Label_SET_SVGA_Mode_VESA_VBE_FAIL:
 	jmp	$
 
 EndModeListLoop:
+jmp $
 	; 判断是否有符合的候选项
 	cmp dword [CandidateMode], 0
 	jz	Label_SET_SVGA_Mode_VESA_VBE_FAIL
@@ -927,8 +881,6 @@ GetMemStructErrMessage:	    db	"Get Memory Struct ERROR"
 GetMemStructOKMessage:	    db	"Get Memory Struct SUCCESSFUL!"
 StartGetSVGAVBEInfoMessage:	db	"Start Get SVGA VBE Info"
 GetSVGAVBEInfoErrMessage:	    db	"Get SVGA VBE Info ERROR"
-GetSVGAVBEInfoOKMessage:	    db	"Get SVGA VBE Info SUCCESSFUL!"
-StartGetSVGAModeInfoMessage:	db	"Start Get SVGA Mode Info"
 GetSVGAModeInfoErrMessage:	    db	"Get SVGA Mode Info ERROR"
 GetSVGAModeInfoOKMessage:	    db	"Get SVGA Mode Info SUCCESSFUL!"
 SetSVGAModeErrMessage:		    db	"Set SVGA Mode ERROR"
