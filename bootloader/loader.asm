@@ -629,6 +629,7 @@ EndModeListLoop:
 	; ======= 设置 SVGA 模式（调用 VBE函数 4F02h） =======
 	mov	ax,	4F02h
 	mov	bx,	[CandidateMode]	; 设置对应模式号
+	add bx, 4000h			; 高分辨率扩展模式号需要以4开头，以启用线性帧缓冲
 	int 	10h
 	cmp	ax,	004Fh
 	jnz	Label_SET_SVGA_Mode_VESA_VBE_FAIL
