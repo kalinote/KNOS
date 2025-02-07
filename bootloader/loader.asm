@@ -562,9 +562,7 @@ Label_SET_SVGA_Mode_VESA_VBE_FAIL:
 	int 10h
 	jmp	$
 
-EndModeListLoop:
-jmp $
-	; 判断是否有符合的候选项
+EndModeListLoop:	; 判断是否有符合的候选项
 	cmp dword [CandidateMode], 0
 	jz	Label_SET_SVGA_Mode_VESA_VBE_FAIL
 
