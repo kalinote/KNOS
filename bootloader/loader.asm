@@ -592,7 +592,7 @@ EndModeListLoop:	; 判断是否有符合的候选项
 	db	0x66
 	lgdt	[GdtPtr]         ; 重新加载32位GDT
 
-	; 可选：加载IDT（此处被注释掉了）
+	; 可选：加载IDT
 	; db	0x66
 	; lidt	[IDT_POINTER]
 

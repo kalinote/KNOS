@@ -1,3 +1,7 @@
+/* 
+ *  kernel/kernel_link.ld
+ *  内核链接脚本
+ */
 OUTPUT_FORMAT("elf64-x86-64","elf64-x86-64","elf64-x86-64")
 OUTPUT_ARCH(i386:x86-64)
 ENTRY(_start)
