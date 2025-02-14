@@ -66,6 +66,8 @@ go_to_kernel:
 ;         0x000083, 0x200083, 0x400083, 0x600083, 0x800083,
 ;         0xe0000083, 0xe0200083, 0xe0400083, 0xe0600083,
 ;         0xe0800083, 0xe0a00083, 0xe0c00083, 0xe0e00083，
+;         0xe8000083, 0xe8200083, 0xe8400083, 0xe8600083,
+;         ...
 ;         其余项填 0
 setup_pagetables:
     cld
@@ -167,7 +169,7 @@ setup_pagetables:
     mov rax, 0xe8e00083
     mov [rdi], rax
     add rdi, 8
-    ; 填充剩余 499 项为 0
+    ; 填充剩余 491 项为 0
     mov ecx, 491
     xor rax, rax
     rep stosq
