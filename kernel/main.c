@@ -1,5 +1,6 @@
 void Start_Kernel(void) {
-	int *addr = (int *)(0xffff800000a00000);		// bochs VBE帧缓存地址，对应物理地址 0xe0000000
+	// int *addr = (int *)(0xffff800000a00000);		// bochs VBE帧缓存地址，对应物理地址 0xe0000000
+	int *addr = (int *)(0xffff800001a00000);		// vmware workstation VBE帧缓存地址，对应物理地址0xe8000000
 	int i;
 
 

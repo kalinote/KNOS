@@ -143,8 +143,32 @@ setup_pagetables:
     mov rax, 0xe0e00083
     mov [rdi], rax
     add rdi, 8
+    mov rax, 0xe8000083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8200083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8400083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8600083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8800083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8a00083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8c00083
+    mov [rdi], rax
+    add rdi, 8
+    mov rax, 0xe8e00083
+    mov [rdi], rax
+    add rdi, 8
     ; 填充剩余 499 项为 0
-    mov ecx, 499
+    mov ecx, 491
     xor rax, rax
     rep stosq
 
