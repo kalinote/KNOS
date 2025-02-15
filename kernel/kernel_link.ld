@@ -39,6 +39,4 @@ SECTIONS
 	}: data
 
 	_end = .;
-
-    .note.GNU-stack : {}
 }
