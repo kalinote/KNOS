@@ -7,37 +7,38 @@ OUTPUT_ARCH(i386:x86-64)
 ENTRY(_start)
 
 PHDRS {
-    text PT_LOAD FLAGS(0x5);  /* 代码段：读和执行 (R+X) */
-    data PT_LOAD FLAGS(0x6);  /* 数据段：读和写 (R+W) */
+    text PT_LOAD FLAGS(5);   /* R-X */
+    data PT_LOAD FLAGS(6);   /* RW- */
+    rodata PT_LOAD FLAGS(4); /* R-- */
 }
 
 SECTIONS
 {
-    /* 将链接地址设置为高端内核虚拟地址 + 偏移 */
-    . = 0xffff800000000000 + 0x100000;
 
-    /* 代码段：只读+可执行 */
-    .text : {
-        _text = .;
-        *(.text)
-        _etext = .;
-    } :text
+	. = 0xffff800000000000 + 0x100000;
+	.text :
+	{
+		_text = .;
+		*(.text)
 
-    . = ALIGN(8);
+		_etext = .;
+	}: text
+	. = ALIGN(8);
+	.data :
+	{
+		_data = .;
+		*(.data)
+		
+		_edata = .;
+	}: data
+	.bss :
+	{
+		_bss = .;
+		*(.bss)
+		_ebss = .;
+	}: data
 
-    /* 数据段：只读+可写 */
-    .data : {
-        _data = .;
-        *(.data)
-        _edata = .;
-    } :data
+	_end = .;
 
-    /* BSS 段也归入 data 程序头 */
-    .bss : {
-        _bss = .;
-        *(.bss)
-        _ebss = .;
-    } :data
-
-    _end = .;
+    .note.GNU-stack : {}
 }
