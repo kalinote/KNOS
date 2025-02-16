@@ -2,28 +2,10 @@
 #include "lib.h"
 
 /**
- * 初始化VBE信息
- */
-void init_vbe_info(void) {
-    printk_pos.x_resolution = 1024;
-    printk_pos.y_resolution = 768;
-
-    printk_pos.x_position = 0;
-    printk_pos.y_position = 0;
-
-    printk_pos.x_char_size = 8;
-    printk_pos.y_char_size = 16;
-
-    printk_pos.fb_addr = (uint32_t *)0xffff800001a00000;
-    printk_pos.fb_length = (printk_pos.x_resolution * printk_pos.y_resolution * 4);
-    printk_pos.bpp = 32;
-}
-
-/**
  * @brief 在当前打印位置绘制一个颜色字符。
  *
  * 该函数从全局数组 font_ascii 中读取指定的字符（由参数 font 决定）字形数据，  
- * 然后将它以 8x16 像素的尺寸写入到由全局变量 printk_pos 指定的帧缓冲区。  
+ * 然后将它以 8x16 像素的尺寸写入到由全局变量 PrintkPos 指定的帧缓冲区。  
  * 在绘制过程中，函数会根据字形数据的像素位来决定是使用前景色（char_color）  
  * 还是背景色（bg_color）。
  *
@@ -32,20 +14,20 @@ void init_vbe_info(void) {
  * @param font       字体（或 ASCII 字符）在 font_ascii 数组中的索引。
  *
  * @note 
- * 1. 函数依赖全局的 printk_pos 结构来获取绘制位置和帧缓冲区地址，  
- *    请在调用前确保 printk_pos 的各字段已正确设置。  
+ * 1. 函数依赖全局的 PrintkPos 结构来获取绘制位置和帧缓冲区地址，  
+ *    请在调用前确保 PrintkPos 的各字段已正确设置。  
  * 2. 每次调用只负责绘制一个 8x16 大小的字符。若需连续打印多个字符，  
- *    需在外部循环中多次调用本函数，并更新 printk_pos。  
+ *    需在外部循环中多次调用本函数，并更新 PrintkPos。  
  */
 void put_color_char(uint32_t char_color, uint32_t bg_color, uint8_t font) {
     uint8_t *fontp = font_ascii[font];
-    uint8_t *byte_fb = (uint8_t *)printk_pos.fb_addr;
+    uint8_t *byte_fb = (uint8_t *)PrintkPos.FrameBufferAddr;
 
     for (int32_t i = 0; i < 16; i++) {    // 每行16像素
         for (int32_t j = 0; j < 8; j++) { // 每字符8像素宽
             // 计算当前像素的字节偏移（修正坐标计算）
-            int32_t y_offset = (printk_pos.y_position + i) * printk_pos.x_resolution * 4;
-            int32_t x_offset = (printk_pos.x_position + j) * 4;
+            int32_t y_offset = (PrintkPos.YPosition + i) * PrintkPos.XResolution * 4;
+            int32_t x_offset = (PrintkPos.XPosition + j) * 4;
             uint8_t *pixel = byte_fb + y_offset + x_offset;
 
             // 设置颜色
@@ -455,7 +437,7 @@ int32_t vsnprintf(int8_t *buf, size_t size, const char *fmt, va_list args) {
  * @brief 使用指定前景色和背景色格式化打印字符串，并处理控制字符
  * 
  * 该函数将格式化后的字符串输出到屏幕，支持换行符(\\n)、退格符(\\b)、制表符(\\t)等特殊字符，
- * 自动处理屏幕边界回绕和位置计算。使用全局显示位置状态(printk_pos)跟踪当前输出位置。
+ * 自动处理屏幕边界回绕和位置计算。使用全局显示位置状态(PrintkPos)跟踪当前输出位置。
  * 
  * @param char_color 字符颜色代码 (RGB或预设颜色值，取决于系统实现)
  * @param bg_color 背景颜色代码 (格式同char_color)
@@ -497,39 +479,39 @@ int32_t vcolor_printk(uint32_t char_color, uint32_t bg_color, const char *fmt, v
             goto Label_tab;
         }
         if ((unsigned char)*(printk_buf + count) == '\n') {
-            printk_pos.y_position += printk_pos.y_char_size;
-            printk_pos.x_position = 0;
+            PrintkPos.YPosition += PrintkPos.YCharSize;
+            PrintkPos.XPosition = 0;
         } else if ((unsigned char)*(printk_buf + count) == '\b') {
-            printk_pos.x_position -= printk_pos.x_char_size;
-            if (printk_pos.x_position < 0) {
-                printk_pos.x_position = printk_pos.x_resolution - printk_pos.x_char_size;
-                printk_pos.y_position -= printk_pos.y_char_size;
-                if (printk_pos.y_position < 0) {
-                    printk_pos.y_position = printk_pos.y_resolution - printk_pos.y_char_size;
+            PrintkPos.XPosition -= PrintkPos.XCharSize;
+            if (PrintkPos.XPosition < 0) {
+                PrintkPos.XPosition = PrintkPos.XResolution - PrintkPos.XCharSize;
+                PrintkPos.YPosition -= PrintkPos.YCharSize;
+                if (PrintkPos.YPosition < 0) {
+                    PrintkPos.YPosition = PrintkPos.YResolution - PrintkPos.YCharSize;
                 }
             }
             put_color_char(char_color, bg_color, ' ');
         } else if ((unsigned char)*(printk_buf + count) == '\t') {
-            int current_char_x = printk_pos.x_position / printk_pos.x_char_size;
+            int current_char_x = PrintkPos.XPosition / PrintkPos.XCharSize;
             line = ((current_char_x + 8) & ~(8 - 1)) - current_char_x;
 
         Label_tab:
             line--;
             put_color_char(char_color, bg_color, ' ');
-            printk_pos.x_position += printk_pos.x_char_size;
+            PrintkPos.XPosition += PrintkPos.XCharSize;
         } else {
             put_color_char(char_color, bg_color, (unsigned char)*(printk_buf + count));
-            printk_pos.x_position += printk_pos.x_char_size;
+            PrintkPos.XPosition += PrintkPos.XCharSize;
         }
 
         // 边界检查
-        if (printk_pos.x_position >= printk_pos.x_resolution) {
-            printk_pos.y_position += printk_pos.y_char_size;
-            printk_pos.x_position = 0;
+        if (PrintkPos.XPosition >= PrintkPos.XResolution) {
+            PrintkPos.YPosition += PrintkPos.YCharSize;
+            PrintkPos.XPosition = 0;
         }
-        if (printk_pos.y_position >= printk_pos.y_resolution) {
+        if (PrintkPos.YPosition >= PrintkPos.YResolution) {
             // 这里是直接返回第一行开始打印，按照现在的日志输出直觉，可能进行页面滚动会比较好
-            printk_pos.y_position = 0;
+            PrintkPos.YPosition = 0;
         }
     }
     return i;

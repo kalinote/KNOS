@@ -9,6 +9,9 @@
         "new": "cpp",
         "ostream": "cpp",
         "functional": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "lib.h": "c",
+        "stdarg.h": "c",
+        "vbe.h": "c"
     }
 }

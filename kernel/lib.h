@@ -1,6 +1,10 @@
 #ifndef __LIB__H__
 #define __LIB_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -44,5 +48,9 @@ int32_t strlen(const char *str) {
                          :);
     return __res;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

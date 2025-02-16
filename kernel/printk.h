@@ -1,14 +1,14 @@
 #ifndef __PRINTK_H__
 #define __PRINTK_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include "font.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // 打包ARGB色彩值
 #define ARGB_PACK(a,r,g,b) \
@@ -47,7 +47,6 @@ char printk_buf[4096]={0};      /* 内核打印缓冲区 */
 
 extern unsigned char font_ascii[256][16];
 
-void init_vbe_info(void);
 void put_color_char(uint32_t char_color, uint32_t bg_color, uint8_t font);
 int32_t color_printk(uint32_t char_color, uint32_t bg_color, const char *fmt, ...);
 int32_t printk(const char *fmt, ...);
@@ -61,19 +60,19 @@ int32_t fatalk(const char *fmt, ...);
  * 内核打印信息结构
  */
 struct position {
-    int32_t x_resolution;       // X分辨率
-    int32_t y_resolution;       // Y分辨率
+    int32_t XResolution;       // X分辨率
+    int32_t YResolution;       // Y分辨率
 
-    int32_t x_position;         // 下一个字符X坐标（像素）
-    int32_t y_position;         // 下一个字符Y坐标（像素）
+    int32_t XPosition;         // 下一个字符X坐标（像素）
+    int32_t YPosition;         // 下一个字符Y坐标（像素）
 
-    int32_t x_char_size;        // 字符X尺寸（像素/字符）
-    int32_t y_char_size;        // 字符Y尺寸（像素/字符）
+    int32_t XCharSize;        // 字符X尺寸（像素/字符）
+    int32_t YCharSize;        // 字符Y尺寸（像素/字符）
 
-    uint32_t *fb_addr;          // 帧缓冲区线性地址
-    uint64_t fb_length;         // 帧缓冲区长度
+    uint32_t *FrameBufferAddr;          // 帧缓冲区线性地址
+    uint64_t FrameBufferLength;         // 帧缓冲区长度
     uint8_t bpp;                // 每个像素占多少位
-} printk_pos;
+} PrintkPos;
 
 
 #ifdef __cplusplus

@@ -4,6 +4,10 @@
 #ifndef __CPU_H__
 #define __CPU_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "lib.h"
 
 /**
@@ -91,5 +95,8 @@ uint32_t cpu_physical_cores() {
     return package_logical / smt_threads;
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

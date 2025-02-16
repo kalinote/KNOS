@@ -1,6 +1,10 @@
 #ifndef __FONT_H__
 #define __FONT_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 unsigned char font_ascii[256][16] = {
 	/*	0000	*/
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
@@ -313,6 +317,10 @@ unsigned char font_ascii[256][16] = {
 
 
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

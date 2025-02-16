@@ -1,5 +1,6 @@
 #include "printk.h"
 #include "cpu.h"
+#include "vbe.h"
 
 void Test_Printk_Function(void) {
     // 1. 基础字符串与换行
@@ -54,9 +55,9 @@ void Test_Printk_Function(void) {
 void Start_Kernel(void) {
     init_vbe_info();
 
-    // int32_t *frame_buffer = (int32_t *)(0xffff800000a00000);		// bochs VBE帧缓存地址，对应物理地址 0xe0000000
+    int32_t *frame_buffer = (int32_t *)(0xffff800000a00000);		// bochs VBE帧缓存地址，对应物理地址 0xe0000000
 
-    int32_t *frame_buffer = (int32_t *)(0xffff800001a00000); // VMware Workstation VBE帧缓存地址
+    // int32_t *frame_buffer = (int32_t *)(0xffff800001a00000); // VMware Workstation VBE帧缓存地址
     int32_t total_width = 1024;                              // 假设屏幕宽度为1024像素
     int32_t bar_height = 20;                                 // 每个色带20行高度
 
@@ -89,6 +90,15 @@ void Start_Kernel(void) {
     }
 
     Test_Printk_Function();
+
+	// 打印vbe_info结构体信息
+	printk("vbe_info:\n");
+	printk("ModeAttributes: %#x\n", vbe_info->ModeAttributes);
+	printk("XResolution: %d\n", vbe_info->XResolution);
+	printk("YResolution: %d\n", vbe_info->YResolution);
+	printk("BitsPerPixel: %d\n", vbe_info->BitsPerPixel);
+	printk("PhysBasePtr: %#X\n", vbe_info->PhysBasePtr);
+	printk("MaxPixelClock(VBE3.0, Not necessarily supported): %d\n", vbe_info->MaxPixelClock);
 
     while (1)
         ;
