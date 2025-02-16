@@ -1,11 +1,13 @@
 # /kernel/Makefile
 
 GCC = gcc
+GXX = g++
 LD = ld
 NASM = nasm
 OBJCOPY = objcopy 
 AS = as
 CFLAGS = -mcmodel=large -fno-builtin -m64 -ffreestanding -nostdlib -fno-pic -Wa,--noexecstack
+CXXFLAGS = $(CFLAGS)
 
 all: system
 	$(OBJCOPY) -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary system ../kal/KERNEL.KAL

@@ -12,9 +12,7 @@ PHDRS {
     rodata PT_LOAD FLAGS(4); /* R-- */
 }
 
-SECTIONS
-{
-
+SECTIONS {
 	. = 0xffff800000000000 + 0x100000;
 	.text :
 	{

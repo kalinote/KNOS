@@ -1,6 +1,14 @@
 {
     "files.associations": {
         "cstdlib": "c",
-        "font.h": "c"
+        "font.h": "c",
+        "printk.h": "c",
+        "stdint.h": "c",
+        "random": "c",
+        "string": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "functional": "cpp",
+        "typeinfo": "cpp"
     }
 }
