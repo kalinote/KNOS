@@ -10,12 +10,12 @@ AS      := as
 # 构建参数
 ASFLAGS      := --64 --noexecstack
 CFLAGS       := -mcmodel=large -fno-builtin -m64 -ffreestanding \
-                -nostdlib -fno-pic -Wa,--noexecstack
+                -nostdlib -fno-pic -Wall -Wa,--noexecstack
 LD_FLAGS     := -b elf64-x86-64 -z muldefs --warn-common -z noexecstack
 OBJCOPY_FLAGS:= -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary
 
 # 生成目标
-OBJS := head.o main.o printk.o vbe.o
+OBJS := head.o trap_entry.o main.o printk.o vbe.o idt.o trap.o gdt.o
 TARGET := system
 BINARY := ../kal/KERNEL.KAL
 

@@ -12,6 +12,22 @@
         "typeinfo": "cpp",
         "lib.h": "c",
         "stdarg.h": "c",
-        "vbe.h": "c"
+        "vbe.h": "c",
+        "idt.h": "c",
+        "trap.h": "c",
+        "compare": "cpp",
+        "cstdint": "cpp",
+        "tss.h": "c",
+        "stddef.h": "c",
+        "*.tcc": "c",
+        "cstdio": "c",
+        "array": "c",
+        "deque": "c",
+        "unordered_map": "c",
+        "vector": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "gate.h": "c",
+        "gdt.h": "c"
     }
 }

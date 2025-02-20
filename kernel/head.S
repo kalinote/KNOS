@@ -7,6 +7,8 @@
 .globl _start             // 声明全局符号_start，作为程序入口点
 
 _start:
+    cli                  // 在内核完成idt和异常处理前暂时保持中断禁用
+
     // 加载全局描述符表(GDT)和中断描述符表(IDT)
     lgdt    GDT_POINTER(%rip)  // 使用RIP相对寻址加载GDT地址
     lidt    IDT_POINTER(%rip)  // 加载IDT地址
@@ -99,7 +101,6 @@ __PDE:                         // 页目录表(PD)
 
 //======= GDT定义
 .section .data
-
 .globl GDT_Table
 GDT_Table:
     .quad    0x0000000000000000  // 0 空描述符
@@ -127,6 +128,7 @@ IDT_LIMIT:    .word    IDT_END - IDT_Table - 1
 IDT_BASE:     .quad    IDT_Table
 
 //======= TSS定义
+.align 16
 .globl    TSS64_Table
 TSS64_Table:
     .fill    13,8,0            // TSS结构（104字节）

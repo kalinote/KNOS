@@ -51,11 +51,11 @@ void put_color_char(uint32_t char_color, uint32_t bg_color, uint8_t font) {
  * @flags: 格式化标志（见宏定义）
  * 返回值：更新后的缓冲区位置
  */
-static int8_t *number(int8_t *str, const int8_t *end, int64_t num, int32_t base, int32_t width, int32_t prec,
-                      int32_t flags) {
+static int8_t *number(int8_t *str, const int8_t *end, uint64_t num, int32_t base, int32_t width, int32_t prec,
+                      int32_t flags, int is_negative) {
     int8_t sign = 0;      // 符号字符（+/-/空格）
     int8_t tmp[72];       // 临时存储逆序数字（64位二进制最大长度+冗余）
-    const int8_t *digits; // 数字字符集
+    const char *digits; // 数字字符集
     int32_t i = 0;        // tmp数组索引
     int32_t pad_len;      // 填充字符数量
     int8_t pad_char;      // 填充字符（'0'或' '）
@@ -78,9 +78,8 @@ static int8_t *number(int8_t *str, const int8_t *end, int64_t num, int32_t base,
 
     /* 5. 处理符号 */
     if (flags & SIGN) {
-        if (num < 0) {
+        if (is_negative) {
             sign = '-';
-            num = -num; // 转为正数处理
         } else if (flags & PLUS) {
             sign = '+';
         } else if (flags & SPACE) {
@@ -102,7 +101,7 @@ static int8_t *number(int8_t *str, const int8_t *end, int64_t num, int32_t base,
         tmp[i++] = '0'; // 直接处理0的情况
     } else {
         while (num != 0 && i < sizeof(tmp)) {
-            int64_t rem = num % base;
+            uint64_t rem = num % base;
             num /= base;
             tmp[i++] = digits[rem]; // 取余得到当前位字符
         }
@@ -173,6 +172,7 @@ static int8_t *number(int8_t *str, const int8_t *end, int64_t num, int32_t base,
  * @fmt: 格式化字符串
  * @args: 可变参数列表
  * 返回值：写入的字符数（不含结尾'\0'），若缓冲区不足则返回理论需要的字符数
+ * TODO: 部分时候对十六进制数字处理还有点问题
  */
 int32_t vsnprintf(int8_t *buf, size_t size, const char *fmt, va_list args) {
     int8_t *str = buf;                    // 当前写入位置
@@ -236,7 +236,7 @@ int32_t vsnprintf(int8_t *buf, size_t size, const char *fmt, va_list args) {
             }
         }
 
-    parse_precision:
+    // parse_precision:         // 暂未使用
         /* 解析精度（.后接数字或*） */
         int32_t precision = -1;
         if (*fmt == '.') {
@@ -330,73 +330,51 @@ int32_t vsnprintf(int8_t *buf, size_t size, const char *fmt, va_list args) {
             field_width = sizeof(void *) * 2; // 默认宽度为指针长度两倍
             flags |= ZEROPAD;
             uint64_t num = (uint64_t)va_arg(args, void *);
-            str = number(str, end, num, 16, field_width, precision, flags);
+            str = number(str, end, num, 16, field_width, precision, flags, 0);
             break;
         }
 
         /* 数值类型（d, i, u, o, x, X） */
         case 'd':
         case 'i':
-            flags |= SIGN; // 有符号数
-                           // 无break，继续处理无符号逻辑
-
+            flags |= SIGN;
+            int64_t signed_num;
+            // 根据长度修饰符获取有符号数
+            switch (qualifier) {
+                case 'l': signed_num = va_arg(args, int64_t); break;
+                case '2': signed_num = va_arg(args, int64_t); break;
+                case 'h': signed_num = (int16_t)va_arg(args, int32_t); break;
+                default:  signed_num = va_arg(args, int32_t);
+            }
+            int is_negative = (signed_num < 0);
+            uint64_t num = is_negative ? (uint64_t)(-signed_num) : (uint64_t)signed_num;
+            str = number(str, end, num, 10, field_width, precision, flags, is_negative);
+            break;
         case 'u':
         case 'o':
         case 'x':
+            uint64_t low_num;
+            // 根据长度修饰符获取无符号数
+            switch (qualifier) {
+                case 'l': low_num = va_arg(args, uint64_t); break;
+                case '2': low_num = va_arg(args, uint64_t); break;
+                case 'h': low_num = (uint16_t)va_arg(args, uint32_t); break;
+                default:  low_num = va_arg(args, uint32_t);
+            }
+            flags |= SMALL;     // 小写
+            str = number(str, end, low_num, 16, field_width, precision, flags, 0); // 无符号数，is_negative=0
+            break;
         case 'X': {
-            uint64_t num = 0;
-            int base = 10;
-
-            /* 设置进制 */
-            switch (*fmt) {
-            case 'o':
-                base = 8;
-                break;
-            case 'x':
-            case 'X':
-                base = 16;
-                break;
+            uint64_t upper_num;
+            // 根据长度修饰符获取无符号数
+            switch (qualifier) {
+                case 'l': upper_num = va_arg(args, uint64_t); break;
+                case '2': upper_num = va_arg(args, uint64_t); break;
+                case 'h': upper_num = (uint16_t)va_arg(args, uint32_t); break;
+                default:  upper_num = va_arg(args, uint32_t);
             }
-
-            /* 处理大小写 */
-            if (*fmt == 'x')
-                flags |= SMALL;
-
-            /* 解析数值（考虑长度修饰符） */
-            if (flags & SIGN) { // 有符号数
-                int64_t signed_num;
-                switch (qualifier) {
-                case 'l':
-                    signed_num = va_arg(args, int32_t);
-                    break;
-                case '2':
-                    signed_num = va_arg(args, int64_t);
-                    break; // ll
-                case 'h':
-                    signed_num = (int16_t)va_arg(args, int32_t);
-                    break;
-                default:
-                    signed_num = va_arg(args, int32_t);
-                }
-                num = (signed_num < 0) ? -signed_num : signed_num;
-            } else { // 无符号数
-                switch (qualifier) {
-                case 'l':
-                    num = va_arg(args, uint32_t);
-                    break;
-                case '2':
-                    num = va_arg(args, uint64_t);
-                    break; // ll
-                case 'h':
-                    num = (uint16_t)va_arg(args, uint32_t);
-                    break;
-                default:
-                    num = va_arg(args, uint32_t);
-                }
-            }
-
-            /* 调用数值格式化函数 */
-            str = number(str, end, num, base, field_width, precision, flags);
+            flags &= ~SMALL;  // 禁用小写标志
+            str = number(str, end, upper_num, 16, field_width, precision, flags, 0); // 无符号数，is_negative=0
             break;
         }
 
@@ -558,7 +536,6 @@ int32_t printk(const char *fmt, ...) {
  */
 static int32_t logk_impl(uint32_t fg, uint32_t bg, const char* tag, const char* fmt, va_list args) {
     // 后续对该操作添加原子锁
-    int32_t tag_len = strlen(tag);
     int32_t tag_ret = color_printk(fg, bg, tag);
     int32_t body_ret = vcolor_printk(fg, bg, fmt, args);
     return (tag_ret < 0 || body_ret < 0) ? -1 : tag_ret + body_ret;

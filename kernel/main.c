@@ -1,6 +1,8 @@
 #include "printk.h"
 #include "cpu.h"
 #include "vbe.h"
+#include "idt.h"
+#include "gdt.h"
 
 void Test_Printk_Function(void) {
     // 1. 基础字符串与换行
@@ -97,9 +99,15 @@ void Start_Kernel(void) {
 	printk("XResolution: %d\n", vbe_info->XResolution);
 	printk("YResolution: %d\n", vbe_info->YResolution);
 	printk("BitsPerPixel: %d\n", vbe_info->BitsPerPixel);
-	printk("PhysBasePtr: %#X\n", vbe_info->PhysBasePtr);
+	printk("PhysBasePtr: %#x\n", vbe_info->PhysBasePtr);
 	printk("MaxPixelClock(VBE3.0, Not necessarily supported): %d\n", vbe_info->MaxPixelClock);
 
-    while (1)
-        ;
+    setup_idt();
+    setup_tss64();
+
+    // int i = 1/0;                                        // 除零异常
+    // *(volatile uint64_t*)0x23a00000 = 0xDEADBEEF;    // 页错误
+    
+    logk("Run into kernel hlt loop.\n");
+    while (1);
 }

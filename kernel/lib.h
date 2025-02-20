@@ -15,7 +15,7 @@ extern "C" {
         __res;                                                                                                         \
     })
 
-void *memcpy(void *dest, void *src, size_t n) {
+static inline void __attribute__((always_inline)) *memcpy(void *dest, void *src, size_t n) {
     int32_t d0, d1, d2;
     __asm__ __volatile__("cld	\n\t"
                          "rep	\n\t"
@@ -36,7 +36,7 @@ void *memcpy(void *dest, void *src, size_t n) {
     return dest;
 }
 
-int32_t strlen(const char *str) {
+static inline int32_t strlen(const char *str) {
     register int32_t __res;
     __asm__ __volatile__("cld	\n\t"
                          "repne	\n\t"
@@ -47,6 +47,24 @@ int32_t strlen(const char *str) {
                          : "D"(str), "a"(0), "0"(0xffffffff)
                          :);
     return __res;
+}
+
+static inline uint8_t __attribute__((always_inline)) io_in8(uint16_t port) {
+	unsigned char ret = 0;
+	__asm__ __volatile__(	"inb	%%dx,	%0	\n\t"
+				"mfence			\n\t"
+				:"=a"(ret)
+				:"d"(port)
+				:"memory");
+	return ret;
+}
+
+static inline void __attribute__((always_inline)) io_out8(uint16_t port, uint8_t value) {
+	__asm__ __volatile__(	"outb	%0,	%%dx	\n\t"
+				"mfence			\n\t"
+				:
+				:"a"(value),"d"(port)
+				:"memory");
 }
 
 #ifdef __cplusplus

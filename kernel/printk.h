@@ -43,7 +43,7 @@ extern "C" {
 
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 
-char printk_buf[4096]={0};      /* 内核打印缓冲区 */
+int8_t printk_buf[4096]={0};      /* 内核打印缓冲区 */
 
 extern unsigned char font_ascii[256][16];
 

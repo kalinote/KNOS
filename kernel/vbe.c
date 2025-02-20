@@ -15,7 +15,7 @@ void init_vbe_info(void) {
     PrintkPos.YCharSize = 16;
 
     // 这里要在初始化内存管理以后再设置，现在还没办法把物理地址转换成虚拟地址
-    PrintkPos.FrameBufferAddr = (uint32_t *)0xffff800000a00000;
+    PrintkPos.FrameBufferAddr = (uint32_t *)0xffff800001a00000;
     PrintkPos.FrameBufferLength = (PrintkPos.XResolution * PrintkPos.YResolution * 4);
     PrintkPos.bpp = vbe_info->BitsPerPixel;
 }
