@@ -34,3 +34,7 @@ clean:
 	rm -f *.vfd
 	rm -rf kal/*.kal kal/*.KAL
 	make -C kernel clean
+
+re:
+	make clean
+	make all

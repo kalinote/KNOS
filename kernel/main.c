@@ -3,6 +3,7 @@
 #include "vbe.h"
 #include "idt.h"
 #include "gdt.h"
+#include "memory.h"
 
 void Test_Printk_Function(void) {
     // 1. 基础字符串与换行
@@ -32,7 +33,7 @@ void Test_Printk_Function(void) {
     // 7. 字符串包含特殊字符
     printk("Special chars: tab\\t, quote\\\", backslash\\\\\n");
 
-    // 8. 测试格式化对齐（若支持）
+    // 8. 测试格式化对齐
     printk("%5d | %-8s | 0x%04x\n", 42, "Test", 0xAB);
 
     // 9. 循环多行输出
@@ -57,9 +58,9 @@ void Test_Printk_Function(void) {
 void Start_Kernel(void) {
     init_vbe_info();
 
-    int32_t *frame_buffer = (int32_t *)(0xffff800000a00000);		// bochs VBE帧缓存地址，对应物理地址 0xe0000000
+    // int32_t *frame_buffer = (int32_t *)(0xffff800000a00000);		// bochs VBE帧缓存地址，对应物理地址 0xe0000000
 
-    // int32_t *frame_buffer = (int32_t *)(0xffff800001a00000); // VMware Workstation VBE帧缓存地址
+    int32_t *frame_buffer = (int32_t *)(0xffff800001a00000); // VMware Workstation VBE帧缓存地址
     int32_t total_width = 1024;                              // 假设屏幕宽度为1024像素
     int32_t bar_height = 20;                                 // 每个色带20行高度
 
@@ -108,6 +109,37 @@ void Start_Kernel(void) {
     // int i = 1/0;                                        // 除零异常
     // *(volatile uint64_t*)0x23a00000 = 0xDEADBEEF;    // 页错误
     
-    logk("Run into kernel hlt loop.\n");
-    while (1);
+    init_memory();
+
+    logk("Attempting to allocate 64 pages from ZONE_NORMAL\n");
+    struct page_frame_struct *page = alloc_pages(ZONE_NORMAL, 64, PAGE_KERNEL | PAGE_PRESENT | PAGE_WRITABLE);
+
+    if (page) {
+        logk("Pages allocated successfully, starting at PFN: %lu\n", page->pfn);
+        
+        // 计算对应的位图位置
+        uint64_t bitmap_word = page->pfn / 64;
+        uint64_t bit_offset = page->pfn % 64;
+        
+        // 打印正确的位图位置
+        color_printk(RED,BLACK,"Page PFN: %lu corresponds to bitmap[%lu], bit %lu\n", 
+                    page->pfn, bitmap_word, bit_offset);
+        color_printk(RED,BLACK,"After allocation bitmap[%lu]:%#018lx\n", 
+                    bitmap_word, global_memory_manager_struct.bitmap.addr[bitmap_word]);
+        color_printk(RED,BLACK,"After allocation bitmap[%lu]:%#018lx\n", 
+                    bitmap_word + 1, global_memory_manager_struct.bitmap.addr[bitmap_word + 1]);
+        
+        // 如果分配了连续64页，检查下一个位图字
+        if (page->pfn % 64 + 64 > 64) {
+            color_printk(RED,BLACK,"After allocation bitmap[%lu]:%#018lx\n", 
+                        bitmap_word + 1, global_memory_manager_struct.bitmap.addr[bitmap_word + 1]);
+        }
+    } else {
+        logk("Page allocation failed!\n");
+    }
+
+    color_printk(DARK_GREEN, WHITE, "Run into kernel hlt loop.\n");
+    while (1)
+        __asm__ volatile("hlt");
+    ;
 }

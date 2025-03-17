@@ -305,21 +305,26 @@ KillMotor:
 	mov	bp,	StartGetMemStructMessage  ; 显示 "Start Get Memory Struct."
 	int	10h
 
-	mov	ebx,	0
-	mov	ax,	0x00
-	mov	es,	ax
-	mov	di,	MemoryStructBufferAddr  ; 内存结构信息缓冲区
+	mov	ebx, 0			; EBX 初始化为0
+	mov	ax,	0
+	mov	es,	ax			; ES 设置为数据段
+	mov di, MemoryStructBufferAddr + 4 ; 结构信息从缓冲区+4开始
+	xor esi, esi
 
 Label_Get_Mem_Struct:
-	; 调用 INT 15h, AH=0xE820 获取内存映射信息，ECX=20 表示缓冲区大小
-	mov	eax,	0x0E820
-	mov	ecx,	20
-	mov	edx,	0x534D4150   ; “SMAP”签名
+	; 调用 INT 15h, AH=0xE820 获取内存映射信息
+	mov	eax,	0x0E820		; 功能号
+	mov	ecx,	20			; 每次读取20字节
+	mov	edx,	0x534D4150		; "SMAP"签名
 	int	15h
-	jc	Label_Get_Mem_Fail     ; 如果出错，跳转到错误处理
-	add	di,	20             ; 每次记录20字节的内存结构信息
-	cmp	ebx,	0
-	jne	Label_Get_Mem_Struct
+	jc	Label_Get_Mem_Fail		; 如果出错跳转
+	inc	esi				; 条目计数器+1
+	add	di,	20			; 缓冲区指针后移20字节
+	cmp	ebx,	0			; 检查EBX是否为0
+	jne	Label_Get_Mem_Struct		; 不为0则继续循环
+
+	; 保存获取的条目数到缓冲区起始位置
+	mov [es:MemoryStructBufferAddr], esi
 	jmp	Label_Get_Mem_OK
 
 Label_Get_Mem_Fail:

@@ -24,8 +24,8 @@ typedef struct {
     // VBE 1.2 及以上版本
     uint16_t XResolution;           // 水平分辨率
     uint16_t YResolution;           // 垂直分辨率
-    uint8_t  XCharSize;             // 字符单元宽度
-    uint8_t  YCharSize;             // 字符单元高度
+    uint8_t  XCharSize;            // 字符单元宽度
+    uint8_t  YCharSize;            // 字符单元高度
     uint8_t  NumberOfPlanes;        // 颜色平面数
     uint8_t  BitsPerPixel;          // 每像素位数
     uint8_t  NumberOfBanks;         // 银行数
@@ -64,9 +64,9 @@ typedef struct {
     uint8_t  LinRsvdFieldPosition;  // 线性模式下保留场位置
     uint32_t MaxPixelClock;         // 最大像素时钟（以Hz为单位）
     uint8_t  Reserved2[189];        // 保留字段
-} VBEModeInfoBlock;
+} vbe_mode_info_block_struct;
 #pragma pack(pop) // 恢复默认对齐
-VBEModeInfoBlock* vbe_info = (VBEModeInfoBlock*)VBE_INFO_VIRT_ADDR;
+vbe_mode_info_block_struct* vbe_info = (vbe_mode_info_block_struct*)VBE_INFO_VIRT_ADDR;
 
 void init_vbe_info(void);
 

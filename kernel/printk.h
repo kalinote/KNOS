@@ -25,11 +25,12 @@ extern "C" {
 #define BLACK ARGB_PACK(0xFF, 0x00, 0x00, 0x00)
 #define RED ARGB_PACK(0xFF, 0xFF, 0x00, 0x00)
 #define GREEN ARGB_PACK(0xFF, 0x00, 0xFF, 0x00)
-#define BLUE ARGB_PACK(0xFF, 0x00, 0xFF, 0x00)
+#define BLUE ARGB_PACK(0xFF, 0x00, 0x00, 0xFF)
 #define YELLOW ARGB_PACK(0xFF, 0xFF, 0xFF, 0x00)
 #define CYAN ARGB_PACK(0xFF, 0xFF, 0xFF, 0xFF)
 #define MAGENTA ARGB_PACK(0xFF, 0xFF, 0x00, 0xFF)
 #define GRAY ARGB_PACK(0xFF, 0x80, 0x80, 0x80)
+#define DARK_GREEN ARGB_PACK(0xFF, 0x00, 0x80, 0x00)
 
 
 #define ZEROPAD	    0x1		    /* 补零 */
@@ -59,20 +60,20 @@ int32_t fatalk(const char *fmt, ...);
 /**
  * 内核打印信息结构
  */
-struct position {
-    int32_t XResolution;       // X分辨率
-    int32_t YResolution;       // Y分辨率
+struct position_struct {
+    int32_t x_resolution;       // X分辨率
+    int32_t y_resolution;       // Y分辨率
 
-    int32_t XPosition;         // 下一个字符X坐标（像素）
-    int32_t YPosition;         // 下一个字符Y坐标（像素）
+    int32_t x_position;         // 下一个字符X坐标（像素）
+    int32_t y_position;         // 下一个字符Y坐标（像素）
 
-    int32_t XCharSize;        // 字符X尺寸（像素/字符）
-    int32_t YCharSize;        // 字符Y尺寸（像素/字符）
+    int32_t x_char_size;        // 字符X尺寸（像素/字符）
+    int32_t y_char_size;        // 字符Y尺寸（像素/字符）
 
-    uint32_t *FrameBufferAddr;          // 帧缓冲区线性地址
-    uint64_t FrameBufferLength;         // 帧缓冲区长度
+    uint32_t *frame_buffer_addr;          // 帧缓冲区线性地址
+    uint64_t frame_buffer_length;         // 帧缓冲区长度
     uint8_t bpp;                // 每个像素占多少位
-} PrintkPos;
+} printk_pos;
 
 
 #ifdef __cplusplus

@@ -28,6 +28,17 @@ void setup_tss64(void);
 
 #define GDT_TSS_INDEX 8  // 对应GDT的索引8和9，每个TSS描述符占两个GDT条目
 
+static inline uint64_t * __attribute__((always_inline)) Get_gdt() {
+	uint64_t * tmp;
+	__asm__ __volatile__	(
+					"movq	%%cr3,	%0	\n\t"
+					:"=r"(tmp)
+					:
+					:"memory"
+				);
+	return tmp;
+}
+
 #ifdef __cplusplus
 }
 #endif
