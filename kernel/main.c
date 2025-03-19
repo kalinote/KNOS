@@ -111,6 +111,7 @@ void Start_Kernel(void) {
     
     init_memory();
 
+    // 测试分配64个页框
     logk("Attempting to allocate 64 pages from ZONE_NORMAL\n");
     struct page_frame_struct *page = alloc_pages(ZONE_NORMAL, 64, PAGE_KERNEL | PAGE_PRESENT | PAGE_WRITABLE);
 
@@ -121,6 +122,7 @@ void Start_Kernel(void) {
         uint64_t bitmap_word = page->pfn / 64;
         uint64_t bit_offset = page->pfn % 64;
         
+
         // 打印正确的位图位置
         color_printk(RED,BLACK,"Page PFN: %lu corresponds to bitmap[%lu], bit %lu\n", 
                     page->pfn, bitmap_word, bit_offset);
@@ -137,6 +139,39 @@ void Start_Kernel(void) {
     } else {
         logk("Page allocation failed!\n");
     }
+
+    // 测试释放页框
+    logk("\nTesting page deallocation...\n");
+    
+    if (page) {
+        // 打印释放前的位图状态
+        uint64_t bitmap_word = page->pfn / 64;
+        color_printk(BLUE,BLACK,"Before freeing - bitmap[%lu]: %#018lx\n", 
+                    bitmap_word, global_memory_manager_struct.bitmap.addr[bitmap_word]);
+        
+        if (page->pfn % 64 + 64 > 64) {
+            color_printk(BLUE,BLACK,"Before freeing - bitmap[%lu]: %#018lx\n", 
+                        bitmap_word + 1, global_memory_manager_struct.bitmap.addr[bitmap_word + 1]);
+        }
+
+        // 释放之前分配的64个页框
+        free_pages(page, 64);
+
+        // 打印释放后的位图状态
+        color_printk(GREEN,BLACK,"After freeing - bitmap[%lu]: %#018lx\n", 
+                    bitmap_word, global_memory_manager_struct.bitmap.addr[bitmap_word]);
+        
+        if (page->pfn % 64 + 64 > 64) {
+            color_printk(GREEN,BLACK,"After freeing - bitmap[%lu]: %#018lx\n", 
+                        bitmap_word + 1, global_memory_manager_struct.bitmap.addr[bitmap_word + 1]);
+        }
+
+        // 验证页框状态
+        struct page_frame_struct *check_page = &global_memory_manager_struct.page.addr[page->pfn];
+        color_printk(RED,BLACK,"First page flags after free: %#x\n", check_page->flags);
+        color_printk(RED,BLACK,"First page ref_count after free: %d\n", check_page->ref_count);
+    }
+    
 
     color_printk(DARK_GREEN, WHITE, "Run into kernel hlt loop.\n");
     while (1)

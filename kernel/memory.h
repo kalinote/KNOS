@@ -142,6 +142,7 @@ void init_memory(void);
 struct page_frame_struct *alloc_pages(enum memory_zone_type zone_type, 
                                      uint32_t nr_pages, 
                                      uint32_t flags);
+void free_pages(struct page_frame_struct *page, uint32_t nr_pages);
 
 extern struct global_memory_manager_struct global_memory_manager_struct;
 extern char _text; 

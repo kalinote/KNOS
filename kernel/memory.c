@@ -509,3 +509,79 @@ struct page_frame_struct *alloc_pages(enum memory_zone_type zone_type,
     
     return &global_memory_manager_struct.page.addr[found_start];
 }
+
+void free_pages(struct page_frame_struct *page, uint32_t nr_pages) {
+    // 参数检查
+    if (!page || nr_pages == 0) {
+        warnk("Invalid parameters in free_pages: page=%p, nr_pages=%u\n", page, nr_pages);
+        return;
+    }
+
+    // 获取起始页框号
+    uint64_t start_pfn = page->pfn;
+    struct memory_zone_struct *zone = page->zone;
+
+    // 检查页框是否属于有效区域
+    if (!zone || start_pfn >= global_memory_manager_struct.page.count) {
+        warnk("Invalid page frame or zone in free_pages: pfn=%lu, zone=%p\n", start_pfn, zone);
+        return;
+    }
+
+    // 添加调试信息
+    logk("Freeing %u pages starting from PFN %lu in zone type %d\n", 
+         nr_pages, start_pfn, zone->type);
+
+    // 遍历并释放每个页框
+    for (uint32_t i = 0; i < nr_pages; ++i) {
+        struct page_frame_struct *current_page = &global_memory_manager_struct.page.addr[start_pfn + i];
+        
+        // 检查页框是否已被释放
+        if (!(current_page->flags & PAGE_USED)) {
+            warnk("Attempting to free unused page: pfn=%lu\n", current_page->pfn);
+            continue;
+        }
+
+        // 减少引用计数
+        if (current_page->ref_count > 0) {
+            current_page->ref_count--;
+            
+            // 如果引用计数不为0，说明还有其他地方在使用这个页框
+            if (current_page->ref_count > 0) {
+                logk("Page PFN %lu still in use (ref_count=%d)\n", 
+                     current_page->pfn, current_page->ref_count);
+                continue;
+            }
+        }
+
+        // 清除页框标志位
+        current_page->flags = 0;
+
+        // 更新位图
+        uint64_t pfn = current_page->pfn;
+        uint64_t word = pfn / 64;
+        uint64_t bit = pfn % 64;
+        
+        // 添加调试信息
+        if (i == 0) {
+            logk("Clearing bitmap - word: %lu, bit: %lu, before: %#018lx\n", 
+                 word, bit, global_memory_manager_struct.bitmap.addr[word]);
+        }
+        
+        // 清除位图中的对应位
+        global_memory_manager_struct.bitmap.addr[word] &= ~(1UL << bit);
+        
+        // 验证位图已被更新
+        if (i == 0) {
+            logk("After clearing bit: %#018lx\n", global_memory_manager_struct.bitmap.addr[word]);
+        }
+
+        // 更新区域统计
+        zone->nr_free++;
+        global_memory_manager_struct.huge_page_info.free_2m_pages++;
+    }
+
+    // 刷新TLB
+    flush_tlb_all();
+    
+    logk("Successfully freed %u pages starting from PFN %lu\n", nr_pages, start_pfn);
+}
